@@ -1,0 +1,57 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TodoApi.Data;
+using TodoApi.Interfaces;
+using TodoApi.Models;
+
+namespace TodoApi.Repository
+{
+    public class CategoryRepository : ICategoryInterface
+    {
+        private readonly DataContext _context;
+
+        public CategoryRepository(DataContext context)
+        {
+            _context = context;   
+        }
+        public Category Getcategory(int id)
+        {
+           return _context.Categories.Where(c => c.Id == id).FirstOrDefault();
+        }
+
+        public ICollection<Category> GetCategories()
+        {
+            return _context.Categories.OrderBy(c=>c.Id).ToList();
+        }
+
+        public ICollection<Pokemon> GetPokemonByCategory(int id)
+        {
+            return _context.PokemonCategories.Where(c=>c.CategoryId == id).Select(c=>c.Pokemon).ToList();
+        }
+
+        public bool IsCategory(int id)
+        {
+            return _context.Categories.Any(c=>c.Id == id);
+        }
+
+        public bool CreateCategory(Category category)
+        {
+            _context.Add(category);
+            return Save();
+        }
+
+        public bool Save()
+        {
+            var saved = _context.SaveChanges();
+            return saved>0 ?true:false;
+        }
+
+        public bool UpdateCategory(Category category)
+        {
+            _context.Update(category);
+            return Save();
+        }
+    }
+}
